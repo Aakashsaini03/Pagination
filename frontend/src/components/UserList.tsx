@@ -20,24 +20,61 @@ function UserList() {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalUsers, setTotalUsers] = useState<number>(0);
 
-  const fetchUsers = async (page: number): Promise<void> => {
-    try {
-      const response = await fetch(`http://localhost:3000/users?page=${page}`);
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
 
-      const data: ApiResponse = await response.json();
+  const fetchUsers = async (
+  page: number,
+  searchName: string = name,
+  searchEmail: string = email,
+): Promise<void> => {
+  try {
+    const params = new URLSearchParams();
 
-      setUsers(data.users);
-      setCurrentPage(data.currentPage);
-      setTotalPages(data.totalPages);
-      setTotalUsers(data.totalUsers);
-    } catch (error) {
-      console.log("Error fetching users:", error);
+    params.append("page", String(page));
+    params.append("pageSize", '5');
+
+    if (searchName.trim() !== "") {
+      params.append("name", searchName.trim());
     }
-  };
 
-  useEffect(() => {
-    fetchUsers(currentPage);
-  }, [currentPage]);
+    if (searchEmail.trim() !== "") {
+      params.append("email", searchEmail.trim());
+    }
+
+    const response = await fetch(
+      `http://localhost:3000/users?${params.toString()}`
+    );
+
+    const data: ApiResponse = await response.json();
+
+    console.log(data);
+
+    setUsers(data.users);
+    setCurrentPage(data.currentPage);
+    setTotalPages(data.totalPages);
+    setTotalUsers(data.totalUsers);
+  } catch (error) {
+    console.log("Error fetching users:", error);
+  }
+};
+
+ useEffect(() => {
+  fetchUsers(currentPage);
+}, [currentPage]);
+
+const handleSearch = () => {
+  setCurrentPage(1);
+  fetchUsers(1, name, email);
+};
+
+const handleClear = () => {
+  setName("");
+  setEmail("");
+  setCurrentPage(1);
+  fetchUsers(1, "", "");
+};
+  
 
   const handleNext = () => {
     if (currentPage < totalPages) {
@@ -53,7 +90,31 @@ function UserList() {
 
   return (
     <div style={{ padding: "30px" }}>
-      <h1>User Pagination</h1>
+      <h1>User Pagination With Filter</h1>
+
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="Search by name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          style={{ padding: "8px", marginRight: "10px" }}
+        />
+
+        <input
+          type="text"
+          placeholder="Search by email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ padding: "8px", marginRight: "10px" }}
+        />
+
+        <button onClick={handleSearch}>Search</button>
+
+        <button onClick={handleClear} style={{ marginLeft: "10px" }}>
+          Clear
+        </button>
+      </div>
 
       <h3>
         Page {currentPage} of {totalPages}
@@ -79,13 +140,19 @@ function UserList() {
         </thead>
 
         <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.name}</td>
-              <td>{user.email}</td>
+          {users.length > 0 ? (
+            users.map((user) => (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={3}>No users found</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
 
