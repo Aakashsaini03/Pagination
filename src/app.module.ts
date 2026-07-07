@@ -3,7 +3,9 @@ import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import{ UserEntity} from './users/user.entity/user.entity'
+import{ Data} from './users/user.entity/user.entity'
+import { UserTypeMaster } from './users/user.entity/usertype.entity';
+import { Gmail } from './users/user.entity/gmail.entity';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -13,10 +15,10 @@ import{ UserEntity} from './users/user.entity/user.entity'
     username:'sa',
     password:'Aaka@123',
     database:'pagination_db',
-    entities:[UserEntity],
-    synchronize:true,
+    entities:[Data,UserTypeMaster,Gmail],
+    synchronize:false,
     options:{
-      encrypt:false,
+      encrypt:true,
       trustServerCertificate:true,
     },
     }),
@@ -24,3 +26,4 @@ import{ UserEntity} from './users/user.entity/user.entity'
   
 })
 export class AppModule {}
+

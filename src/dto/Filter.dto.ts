@@ -14,6 +14,20 @@ export  class FilterDto{
 
   @IsString()
   @IsOptional()
+  usertype?: string;
+
+  @IsString()
+  @IsOptional()
+  salary?: number;
+
+  @IsString()
+  @IsOptional()
+  status?: Boolean;
+
+
+
+  @IsString()
+  @IsOptional()
   email?: string;
 
 }
